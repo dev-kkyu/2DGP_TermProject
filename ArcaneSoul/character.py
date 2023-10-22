@@ -67,7 +67,7 @@ class Idle:
             boy.action = 3
         boy.dir = 0
         boy.frame = 0
-        boy.wait_time = get_time() # pico2d import 필요
+        # boy.wait_time = get_time() # pico2d import 필요
         pass
 
     @staticmethod
@@ -78,13 +78,13 @@ class Idle:
 
     @staticmethod
     def do(boy):
-        boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-        if get_time() - boy.wait_time > 2:
-            boy.state_machine.handle_event(('TIME_OUT', 0))
+        boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
+        # if get_time() - boy.wait_time > 2:
+        #     boy.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(boy):
-        boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
+        boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 198, 358)
 
 
 
@@ -149,7 +149,7 @@ class StateMachine:
         self.boy = boy
         self.cur_state = Idle
         self.transitions = {
-            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, time_out: Sleep, space_down: Idle},
+            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, space_down: Idle},
             Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Run},
             Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run}
         }
@@ -179,12 +179,17 @@ class StateMachine:
 
 class Boy:
     def __init__(self):
-        self.x, self.y = 50, 90
+        self.x, self.y = 150, 260
         self.frame = 0
         self.action = 3
         self.face_dir = 1
         self.dir = 0
-        self.image = load_image('animation_sheet.png')
+        self.walk_images = ([load_image('Resources/Character/Walk/' + str(i) + '.png') for i in range(8)], 8)
+        self.dash_images = ([load_image('Resources/Character/Dash/' + str(i) + '.png') for i in range(1)], 1)
+        self.attack_images = ([load_image('Resources/Character/Attack/' + str(i) + '.png') for i in range(8)], 8)
+        self.idle_images = ([load_image('Resources/Character/Idle/' + str(i) + '.png') for i in range(11)], 11)
+        self.jump_images = ([load_image('Resources/Character/Jump/' + str(i) + '.png') for i in range(7)], 7)
+        self.skill_images = ([load_image('Resources/Character/Skill/' + str(i) + '.png') for i in range(4)], 4)
         self.font = load_font('ENCR10B.TTF', 16)
         self.state_machine = StateMachine(self)
         self.state_machine.start()
@@ -210,7 +215,7 @@ class Boy:
 
     # fill here
     def get_bb(self):
-        return self.x - 20, self.y - 50, self.x + 20, self.y + 50 # 값 4개짜리 튜플 1개
+        return self.x - 99, self.y - 179, self.x + 99, self.y + 179 # 값 4개짜리 튜플 1개
 
     def handle_collision(self, group, other):
         if group == 'boy:ball':

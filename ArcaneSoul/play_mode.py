@@ -4,7 +4,7 @@ from pico2d import *
 import game_framework
 
 import game_world
-from background import Grass
+from background import Grass, Background
 from character import Boy
 from ball import Ball
 from zombie import Zombie
@@ -26,6 +26,9 @@ def init():
     global boy
 
     running = True
+
+    background = Background()
+    game_world.add_object(background, 0)
 
     grass = Grass()
     game_world.add_object(grass, 0)
