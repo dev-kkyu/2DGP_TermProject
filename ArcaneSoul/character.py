@@ -2,6 +2,8 @@
 
 from pico2d import get_time, load_image, load_font, clamp, SDL_KEYDOWN, SDL_KEYUP, SDLK_SPACE, SDLK_LEFT, SDLK_RIGHT, \
     draw_rectangle
+from sdl2 import SDLK_LCTRL
+
 from ball import Ball
 import game_world
 import game_framework
@@ -26,6 +28,9 @@ def left_up(e):
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+def ctrl_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_LCTRL
 
 def time_out(e):
     return e[0] == 'TIME_OUT'
@@ -65,30 +70,83 @@ class Idle:
         boy.dir = 0
         boy.frame = 0
         # boy.wait_time = get_time() # pico2d import 필요
+        if boy.is_attack:
+            Attack.enter(boy, e)
         pass
 
     @staticmethod
     def exit(boy, e):
         # if space_down(e):
         #     boy.fire_ball()
+        if ctrl_down(e):
+            boy.is_attack = True
         pass
 
     @staticmethod
     def do(boy):
-        boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
+        if boy.is_attack:
+            Attack.do(boy)
+        else:
+            boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
         # if get_time() - boy.wait_time > 2:
         #     boy.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(boy):
-        if boy.face_dir == 1:
-            boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+        if boy.is_attack:
+            Attack.draw(boy)
         else:
-            boy.idle_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
+            if boy.face_dir == 1:
+                boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+            else:
+                boy.idle_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
 
 
 
 class Walk:
+
+    @staticmethod
+    def enter(boy, e):
+        boy.frame = 0
+        if right_down(e) or left_up(e): # 오른쪽으로 RUN
+            boy.dir, boy.face_dir = 1, 1
+        elif left_down(e) or right_up(e): # 왼쪽으로 RUN
+            boy.dir, boy.face_dir = -1, -1
+        if boy.is_attack:
+            Attack.enter(boy, e)
+
+    @staticmethod
+    def exit(boy, e):
+        # if space_down(e):
+        #     boy.fire_ball()
+        if ctrl_down(e):
+            boy.is_attack = True
+
+        pass
+
+    @staticmethod
+    def do(boy):
+        if boy.is_attack:
+            Attack.do(boy)
+        else:
+            # boy.frame = (boy.frame + 1) % 8
+            boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
+            boy.x = clamp(25, boy.x, 1280-25)
+            boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.walk_images[1]
+
+
+    @staticmethod
+    def draw(boy):
+        if boy.is_attack:
+            Attack.draw(boy)
+        else:
+            if boy.face_dir == 1:
+                boy.walk_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+            else:
+                boy.walk_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
+            # boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
+
+class Attack:
 
     @staticmethod
     def enter(boy, e):
@@ -108,18 +166,17 @@ class Walk:
     @staticmethod
     def do(boy):
         # boy.frame = (boy.frame + 1) % 8
-        boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
-        boy.x = clamp(25, boy.x, 1600-25)
-        boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.walk_images[1]
+        boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time)
+        if boy.frame >= boy.attack_images[1] // 2:
+            boy.is_attack = False
 
 
     @staticmethod
     def draw(boy):
         if (boy.face_dir == 1):
-            boy.walk_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+            boy.attack_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 324, 270)
         else:
-            boy.walk_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
-        # boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
+            boy.attack_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 324, 270)
 
 
 #
@@ -154,8 +211,9 @@ class StateMachine:
         self.boy = boy
         self.cur_state = Idle
         self.transitions = {
-            Idle: {right_down: Walk, left_down: Walk, left_up: Walk, right_up: Walk, space_down: Idle},
-            Walk: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Walk}
+            Idle: {right_down: Walk, left_down: Walk, left_up: Walk, right_up: Walk, space_down: Idle, ctrl_down: Idle},
+            Walk: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Walk, ctrl_down: Walk},
+            # Attack: {time_out: Idle}
             # Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run}
         }
 
@@ -184,6 +242,7 @@ class StateMachine:
 
 class Boy:
     def __init__(self):
+        self.is_attack = False
         self.x, self.y = 150, 230
         self.frame = 0
         self.face_dir = 1
@@ -197,7 +256,6 @@ class Boy:
         self.font = load_font('ENCR10B.TTF', 16)
         self.state_machine = StateMachine(self)
         self.state_machine.start()
-        self.ball_count = 10
 
 
     # def fire_ball(self):
@@ -214,7 +272,7 @@ class Boy:
 
     def draw(self):
         self.state_machine.draw()
-        self.font.draw(self.x-10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
+        # self.font.draw(self.x-10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
         draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
 
     # fill here

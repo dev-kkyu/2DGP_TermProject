@@ -8,8 +8,8 @@ class Background:
         pass
 
     def draw(self):
-        for x in range(0, 1600, 498):
-                self.image.draw(x + 249, 450, 498, 900)
+        for x in range(0, 1280, 498):
+                self.image.draw(x + 249, 360, 498, 720)
 
 
 class Grass:
@@ -20,5 +20,5 @@ class Grass:
         pass
 
     def draw(self):
-        for x in range(0, 1600, 68):
+        for x in range(0, 1280, 68):
                 self.image.draw(x + 34, 83)
