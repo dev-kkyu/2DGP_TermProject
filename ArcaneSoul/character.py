@@ -37,15 +37,16 @@ def time_out(e):
 
 # Boy Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 20.0  # Km / Hour
+RUN_SPEED_KMPH = 30.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
 
 # Boy Action Speed
-TIME_PER_ACTION = 0.5
-ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
-FRAMES_PER_ACTION = 8
+# TIME_PER_ACTION = 0.5
+# ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+# FRAMES_PER_ACTION = 8
+FRAME_PER_TIME = 10
 
 
 
@@ -61,10 +62,6 @@ class Idle:
 
     @staticmethod
     def enter(boy, e):
-        if boy.face_dir == -1:
-            boy.action = 2
-        elif boy.face_dir == 1:
-            boy.action = 3
         boy.dir = 0
         boy.frame = 0
         # boy.wait_time = get_time() # pico2d import 필요
@@ -78,24 +75,28 @@ class Idle:
 
     @staticmethod
     def do(boy):
-        boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
+        boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
         # if get_time() - boy.wait_time > 2:
         #     boy.state_machine.handle_event(('TIME_OUT', 0))
 
     @staticmethod
     def draw(boy):
-        boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 198, 358)
+        if boy.face_dir == 1:
+            boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+        else:
+            boy.idle_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
 
 
 
-class Run:
+class Walk:
 
     @staticmethod
     def enter(boy, e):
+        boy.frame = 0
         if right_down(e) or left_up(e): # 오른쪽으로 RUN
-            boy.dir, boy.action, boy.face_dir = 1, 1, 1
+            boy.dir, boy.face_dir = 1, 1
         elif left_down(e) or right_up(e): # 왼쪽으로 RUN
-            boy.dir, boy.action, boy.face_dir = -1, 0, -1
+            boy.dir, boy.face_dir = -1, -1
 
     @staticmethod
     def exit(boy, e):
@@ -109,49 +110,53 @@ class Run:
         # boy.frame = (boy.frame + 1) % 8
         boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
         boy.x = clamp(25, boy.x, 1600-25)
-        boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.walk_images[1]
 
 
     @staticmethod
     def draw(boy):
-        boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
-
-
-
-class Sleep:
-
-    @staticmethod
-    def enter(boy, e):
-        boy.frame = 0
-        pass
-
-    @staticmethod
-    def exit(boy, e):
-        pass
-
-    @staticmethod
-    def do(boy):
-        boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-
-
-    @staticmethod
-    def draw(boy):
-        if boy.face_dir == -1:
-            boy.image.clip_composite_draw(int(boy.frame) * 100, 200, 100, 100,
-                                          -3.141592 / 2, '', boy.x + 25, boy.y - 25, 100, 100)
+        if (boy.face_dir == 1):
+            boy.walk_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
         else:
-            boy.image.clip_composite_draw(int(boy.frame) * 100, 300, 100, 100,
-                                          3.141592 / 2, '', boy.x - 25, boy.y - 25, 100, 100)
+            boy.walk_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
+        # boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
 
+
+#
+# class Sleep:
+#
+#     @staticmethod
+#     def enter(boy, e):
+#         boy.frame = 0
+#         pass
+#
+#     @staticmethod
+#     def exit(boy, e):
+#         pass
+#
+#     @staticmethod
+#     def do(boy):
+#         boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+#
+#
+#     @staticmethod
+#     def draw(boy):
+#         if boy.face_dir == -1:
+#             boy.image.clip_composite_draw(int(boy.frame) * 100, 200, 100, 100,
+#                                           -3.141592 / 2, '', boy.x + 25, boy.y - 25, 100, 100)
+#         else:
+#             boy.image.clip_composite_draw(int(boy.frame) * 100, 300, 100, 100,
+#                                           3.141592 / 2, '', boy.x - 25, boy.y - 25, 100, 100)
+#
 
 class StateMachine:
     def __init__(self, boy):
         self.boy = boy
         self.cur_state = Idle
         self.transitions = {
-            Idle: {right_down: Run, left_down: Run, left_up: Run, right_up: Run, space_down: Idle},
-            Run: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Run},
-            Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run}
+            Idle: {right_down: Walk, left_down: Walk, left_up: Walk, right_up: Walk, space_down: Idle},
+            Walk: {right_down: Idle, left_down: Idle, right_up: Idle, left_up: Idle, space_down: Walk}
+            # Sleep: {right_down: Run, left_down: Run, right_up: Run, left_up: Run}
         }
 
     def start(self):
@@ -179,9 +184,8 @@ class StateMachine:
 
 class Boy:
     def __init__(self):
-        self.x, self.y = 150, 260
+        self.x, self.y = 150, 230
         self.frame = 0
-        self.action = 3
         self.face_dir = 1
         self.dir = 0
         self.walk_images = ([load_image('Resources/Character/Walk/' + str(i) + '.png') for i in range(8)], 8)
@@ -215,7 +219,7 @@ class Boy:
 
     # fill here
     def get_bb(self):
-        return self.x - 99, self.y - 179, self.x + 99, self.y + 179 # 값 4개짜리 튜플 1개
+        return self.x - 75, self.y - 135, self.x + 75, self.y + 135 # 값 4개짜리 튜플 1개
 
     def handle_collision(self, group, other):
         if group == 'boy:ball':
