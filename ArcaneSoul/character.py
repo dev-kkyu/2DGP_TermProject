@@ -67,11 +67,12 @@ class Idle:
 
     @staticmethod
     def enter(boy, e):
-        boy.dir = 0
-        boy.frame = 0
         # boy.wait_time = get_time() # pico2d import 필요
         if boy.is_attack:
             Attack.enter(boy, e)
+        else:
+            boy.dir = 0
+            boy.frame = 0
         pass
 
     @staticmethod
@@ -107,13 +108,14 @@ class Walk:
 
     @staticmethod
     def enter(boy, e):
-        boy.frame = 0
-        if right_down(e) or left_up(e): # 오른쪽으로 RUN
-            boy.dir, boy.face_dir = 1, 1
-        elif left_down(e) or right_up(e): # 왼쪽으로 RUN
-            boy.dir, boy.face_dir = -1, -1
         if boy.is_attack:
             Attack.enter(boy, e)
+        elif right_down(e) or left_up(e): # 오른쪽으로 RUN
+            boy.dir, boy.face_dir = 1, 1
+            boy.frame = 0
+        elif left_down(e) or right_up(e): # 왼쪽으로 RUN
+            boy.dir, boy.face_dir = -1, -1
+            boy.frame = 0
 
     @staticmethod
     def exit(boy, e):
@@ -121,6 +123,8 @@ class Walk:
         #     boy.fire_ball()
         if ctrl_down(e):
             boy.is_attack = True
+        elif space_down(e):
+            boy.is_jump = True
 
         pass
 
@@ -147,14 +151,16 @@ class Walk:
             # boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
 
 class Attack:
-
+    is_enter = False
     @staticmethod
     def enter(boy, e):
-        boy.frame = 0
-        if right_down(e) or left_up(e): # 오른쪽으로 RUN
-            boy.dir, boy.face_dir = 1, 1
-        elif left_down(e) or right_up(e): # 왼쪽으로 RUN
-            boy.dir, boy.face_dir = -1, -1
+        if not Attack.is_enter:
+            boy.frame = 0
+            if right_down(e) or left_up(e): # 오른쪽으로 RUN
+                boy.dir, boy.face_dir = 1, 1
+            elif left_down(e) or right_up(e): # 왼쪽으로 RUN
+                boy.dir, boy.face_dir = -1, -1
+            Attack.is_enter = True
 
     @staticmethod
     def exit(boy, e):
@@ -169,6 +175,7 @@ class Attack:
         boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time)
         if boy.frame >= boy.attack_images[1] // 2:
             boy.is_attack = False
+            Attack.is_enter = False
 
 
     @staticmethod
@@ -243,6 +250,7 @@ class StateMachine:
 class Boy:
     def __init__(self):
         self.is_attack = False
+        self.is_jump = False
         self.x, self.y = 150, 230
         self.frame = 0
         self.face_dir = 1
