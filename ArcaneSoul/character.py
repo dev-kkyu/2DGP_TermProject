@@ -68,8 +68,10 @@ class Idle:
     @staticmethod
     def enter(boy, e):
         # boy.wait_time = get_time() # pico2d import 필요
-        if boy.is_attack:
-            Attack.enter(boy, e)
+        if Attack.is_enter:
+            return
+        elif Jump.is_enter:
+            return
         else:
             boy.dir = 0
             boy.frame = 0
@@ -80,13 +82,16 @@ class Idle:
         # if space_down(e):
         #     boy.fire_ball()
         if ctrl_down(e):
-            boy.is_attack = True
-        pass
+            Attack.enter(boy, e)
+        elif space_down(e):
+            Jump.enter(boy, e)
 
     @staticmethod
     def do(boy):
-        if boy.is_attack:
+        if Attack.is_enter:
             Attack.do(boy)
+        elif Jump.is_enter:
+            Jump.do(boy)
         else:
             boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.idle_images[1]
         # if get_time() - boy.wait_time > 2:
@@ -94,8 +99,10 @@ class Idle:
 
     @staticmethod
     def draw(boy):
-        if boy.is_attack:
+        if Attack.is_enter:
             Attack.draw(boy)
+        elif Jump.is_enter:
+            Jump.draw(boy)
         else:
             if boy.face_dir == 1:
                 boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
@@ -108,30 +115,30 @@ class Walk:
 
     @staticmethod
     def enter(boy, e):
-        if boy.is_attack:
-            Attack.enter(boy, e)
-        elif right_down(e) or left_up(e): # 오른쪽으로 RUN
-            boy.dir, boy.face_dir = 1, 1
+        if not Attack.is_enter and not Jump.is_enter:
             boy.frame = 0
+        if right_down(e) or left_up(e): # 오른쪽으로 RUN
+            boy.dir, boy.face_dir = 1, 1
         elif left_down(e) or right_up(e): # 왼쪽으로 RUN
             boy.dir, boy.face_dir = -1, -1
-            boy.frame = 0
 
     @staticmethod
     def exit(boy, e):
         # if space_down(e):
         #     boy.fire_ball()
         if ctrl_down(e):
-            boy.is_attack = True
+            Attack.enter(boy, e)
         elif space_down(e):
-            boy.is_jump = True
+            Jump.enter(boy, e)
 
         pass
 
     @staticmethod
     def do(boy):
-        if boy.is_attack:
+        if Attack.is_enter:
             Attack.do(boy)
+        elif Jump.is_enter:
+            Jump.do(boy)
         else:
             # boy.frame = (boy.frame + 1) % 8
             boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
@@ -141,8 +148,10 @@ class Walk:
 
     @staticmethod
     def draw(boy):
-        if boy.is_attack:
+        if Attack.is_enter:
             Attack.draw(boy)
+        elif Jump.is_enter:
+            Jump.draw(boy)
         else:
             if boy.face_dir == 1:
                 boy.walk_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
@@ -174,7 +183,6 @@ class Attack:
         # boy.frame = (boy.frame + 1) % 8
         boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time)
         if boy.frame >= boy.attack_images[1] // 2:
-            boy.is_attack = False
             Attack.is_enter = False
 
 
@@ -186,32 +194,62 @@ class Attack:
             boy.attack_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 324, 270)
 
 
-#
-# class Sleep:
-#
-#     @staticmethod
-#     def enter(boy, e):
-#         boy.frame = 0
-#         pass
-#
-#     @staticmethod
-#     def exit(boy, e):
-#         pass
-#
-#     @staticmethod
-#     def do(boy):
-#         boy.frame = (boy.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
-#
-#
-#     @staticmethod
-#     def draw(boy):
-#         if boy.face_dir == -1:
-#             boy.image.clip_composite_draw(int(boy.frame) * 100, 200, 100, 100,
-#                                           -3.141592 / 2, '', boy.x + 25, boy.y - 25, 100, 100)
-#         else:
-#             boy.image.clip_composite_draw(int(boy.frame) * 100, 300, 100, 100,
-#                                           3.141592 / 2, '', boy.x - 25, boy.y - 25, 100, 100)
-#
+class Jump:
+    is_enter = False
+    @staticmethod
+    def enter(boy, e):
+        if not Jump.is_enter:
+            boy.frame = 0
+            if right_down(e) or left_up(e): # 오른쪽으로 RUN
+                boy.dir, boy.face_dir = 1, 1
+            elif left_down(e) or right_up(e): # 왼쪽으로 RUN
+                boy.dir, boy.face_dir = -1, -1
+            Jump.is_enter = True
+
+    @staticmethod
+    def exit(boy, e):
+        # if space_down(e):
+        #     boy.fire_ball()
+
+        pass
+
+    velocity = 5
+    gravity = 9.8
+    @staticmethod
+    def jump(boy):
+        # boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time)
+        boy.y += Jump.velocity ** 2 * 0.020 * Jump.gravity * (-1 if Jump.velocity < 0 else 1)
+        Jump.velocity -= 20 * game_framework.frame_time
+        if abs(Jump.velocity) < 1:
+            boy.frame = 3
+        elif Jump.velocity <= -1:
+            boy.frame = 4
+        if boy.y <= 230:
+            boy.y = 230
+            boy.frame = 5
+            Jump.velocity = 5
+        boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 2.5
+        boy.x = clamp(25, boy.x, 1280 - 25)
+        pass
+
+    @staticmethod
+    def do(boy):
+        # boy.frame = (boy.frame + 1) % 8
+        if boy.frame < 2 or boy.frame >= 5:
+            boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time * 2)
+        elif boy.frame < 5:
+            Jump.jump(boy)
+        if boy.frame >= boy.jump_images[1]:
+            Jump.is_enter = False
+
+
+    @staticmethod
+    def draw(boy):
+        if (boy.face_dir == 1):
+            boy.jump_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 217, 300)
+        else:
+            boy.jump_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 217, 300)
+
 
 class StateMachine:
     def __init__(self, boy):
@@ -249,8 +287,6 @@ class StateMachine:
 
 class Boy:
     def __init__(self):
-        self.is_attack = False
-        self.is_jump = False
         self.x, self.y = 150, 230
         self.frame = 0
         self.face_dir = 1
@@ -288,5 +324,7 @@ class Boy:
         return self.x - 75, self.y - 135, self.x + 75, self.y + 135 # 값 4개짜리 튜플 1개
 
     def handle_collision(self, group, other):
-        if group == 'boy:ball':
-            self.ball_count +=1
+        # if group == 'boy:ball':
+        #     self.ball_count +=1
+        pass
+
