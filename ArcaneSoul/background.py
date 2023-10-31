@@ -21,4 +21,5 @@ class Grass:
 
     def draw(self):
         for x in range(0, 1280, 68):
-                self.image.draw(x + 34, 83)
+            self.image.draw(x + 34, 83)
+

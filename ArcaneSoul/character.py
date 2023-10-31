@@ -4,7 +4,6 @@ from pico2d import get_time, load_image, load_font, clamp, SDL_KEYDOWN, SDL_KEYU
     draw_rectangle
 from sdl2 import SDLK_LCTRL
 
-from ball import Ball
 import game_world
 import game_framework
 
@@ -285,9 +284,9 @@ class StateMachine:
 
 
 
-class Boy:
+class Risa:
     def __init__(self):
-        self.x, self.y = 150, 230
+        self.x, self.y = 150, 220
         self.frame = 0
         self.face_dir = 1
         self.dir = 0

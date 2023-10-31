@@ -5,9 +5,8 @@ import game_framework
 
 import game_world
 from background import Grass, Background
-from character import Boy
-from ball import Ball
-from zombie import Zombie
+from character import Risa
+from monster import Monster
 
 # boy = None
 
@@ -33,7 +32,10 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    boy = Boy()
+    monsters = [Monster() for _ in range(5)]
+    game_world.add_objects(monsters, 1)
+
+    boy = Risa()
     game_world.add_object(boy, 1)
 
     # fill here
