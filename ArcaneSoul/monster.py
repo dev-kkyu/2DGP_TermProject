@@ -30,6 +30,8 @@ class Monster:
         self.frame = random.randint(0, 2)
         self.dir = random.choice([-1,1])
         self.is_attack = False
+        self.hp = 100
+        self.font = load_font('ENCR10B.TTF', 30)
 
 
     def update(self):
@@ -57,6 +59,7 @@ class Monster:
             else:
                 Monster.walk_images[0][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 163, 180)
         draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
+        self.font.draw(self.x - 25, self.y + 80, str(self.hp), (255, 0, 0))
 
 
     def handle_event(self, event):
@@ -66,4 +69,3 @@ class Monster:
     def get_bb(self):
         return self.x - 80, self.y - 90, self.x + 80, self.y + 90 # 값 4개짜리 튜플 1개
 
-    
