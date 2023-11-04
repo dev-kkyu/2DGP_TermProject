@@ -284,7 +284,7 @@ class StateMachine:
 
 
 
-class Risa:
+class Lisa:
     def __init__(self):
         self.x, self.y = 150, 220
         self.frame = 0

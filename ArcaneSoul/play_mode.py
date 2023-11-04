@@ -5,7 +5,7 @@ import game_framework
 
 import game_world
 from background import Grass, Background
-from character import Risa
+from character import Lisa
 from monster import Monster
 
 # boy = None
@@ -18,11 +18,11 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            boy.handle_event(event)
+            lisa.handle_event(event)
 
 def init():
     global grass
-    global boy
+    global lisa
 
     running = True
 
@@ -35,8 +35,8 @@ def init():
     monsters = [Monster() for _ in range(5)]
     game_world.add_objects(monsters, 1)
 
-    boy = Risa()
-    game_world.add_object(boy, 1)
+    lisa = Lisa()
+    game_world.add_object(lisa, 1)
 
     # fill here
     # # 축구공 바닥에 뿌리기
