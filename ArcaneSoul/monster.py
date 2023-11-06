@@ -32,6 +32,7 @@ class Monster:
         self.is_attack = False
         self.hp = 100
         self.font = load_font('ENCR10B.TTF', 30)
+        self.last_attack_time = get_time()
 
 
     def update(self):
@@ -62,6 +63,13 @@ class Monster:
         self.font.draw(self.x - 25, self.y + 80, str(self.hp), (255, 0, 0))
 
 
+    def add_hp(self, hp):
+        now_time = get_time()
+        if now_time > self.last_attack_time + 0.5:
+            self.hp += hp
+            self.last_attack_time = now_time
+
+
     def handle_event(self, event):
         pass
 
@@ -69,3 +77,5 @@ class Monster:
     def get_bb(self):
         return self.x - 80, self.y - 90, self.x + 80, self.y + 90 # 값 4개짜리 튜플 1개
 
+    def handle_collision(self, group, other):
+        pass

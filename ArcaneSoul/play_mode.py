@@ -38,6 +38,10 @@ def init():
     lisa = Lisa()
     game_world.add_object(lisa, 1)
 
+    game_world.add_collision_pair('lisa:monster', lisa, None)
+    for mon in monsters:
+        game_world.add_collision_pair('lisa:monster', None, mon)
+
     # fill here
     # # 축구공 바닥에 뿌리기
     # global balls

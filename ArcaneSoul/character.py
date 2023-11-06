@@ -299,6 +299,7 @@ class Lisa:
         self.font = load_font('ENCR10B.TTF', 16)
         self.state_machine = StateMachine(self)
         self.state_machine.start()
+        self.last_attack_time = get_time()
 
 
     # def fire_ball(self):
@@ -320,10 +321,15 @@ class Lisa:
 
     # fill here
     def get_bb(self):
+        if Attack.is_enter:
+            if self.face_dir == 1:
+                return self.x + 90, self.y - 60, self.x + 160, self.y + 60
+            else:
+                return self.x - 90, self.y - 60, self.x - 160, self.y + 60
         return self.x - 75, self.y - 135, self.x + 75, self.y + 135 # 값 4개짜리 튜플 1개
 
     def handle_collision(self, group, other):
-        # if group == 'boy:ball':
-        #     self.ball_count +=1
+        if group == 'lisa:monster':
+            other.add_hp(-10)
         pass
 
