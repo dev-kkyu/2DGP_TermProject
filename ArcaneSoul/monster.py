@@ -59,7 +59,7 @@ class Monster:
                 Monster.walk_images[0][int(self.frame)].composite_draw(0, '', self.x, self.y, 163, 180)
             else:
                 Monster.walk_images[0][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 163, 180)
-        draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
+        # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
         self.font.draw(self.x - 25, self.y + 80, str(self.hp), (255, 0, 0))
 
 
