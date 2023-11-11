@@ -330,6 +330,7 @@ class Lisa:
 
     def handle_collision(self, group, other):
         if group == 'lisa:monster':
-            other.add_hp(-10)
+            if Attack.is_enter:
+                other.add_hp(-10)
         pass
 
