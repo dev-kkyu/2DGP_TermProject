@@ -212,13 +212,18 @@ class Jump:
 
         pass
 
-    velocity = 10
-    gravity = 9.8
+    VEL = RUN_SPEED_PPS * 3.5
+    velocity = VEL
+    gravity = 9.8 * RUN_SPEED_PPS
     @staticmethod
     def jump(boy):
         # boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time)
-        boy.y += Jump.velocity ** 2 * Jump.gravity * 2 * game_framework.frame_time * (-1 if Jump.velocity < 0 else 1)
-        Jump.velocity -= 35 * game_framework.frame_time
+        # boy.y += Jump.velocity ** 2 * Jump.gravity * 2 * game_framework.frame_time * (-1 if Jump.velocity < 0 else 1)
+        # Jump.velocity -= 35 * game_framework.frame_time
+
+        boy.y += Jump.velocity * game_framework.frame_time
+        Jump.velocity -= Jump.gravity * game_framework.frame_time
+
         if abs(Jump.velocity) < 1:
             boy.frame = 3
         elif Jump.velocity <= -1:
@@ -226,8 +231,8 @@ class Jump:
         if boy.y <= 230:
             boy.y = 230
             boy.frame = 5
-            Jump.velocity = 10
-        boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 2
+            Jump.velocity = Jump.VEL
+        boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 1.5
         boy.x = clamp(25, boy.x, 1280 - 25)
         pass
 
