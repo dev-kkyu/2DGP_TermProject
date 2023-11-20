@@ -337,5 +337,9 @@ class Lisa:
         if group == 'lisa:monster':
             if Attack.is_enter:
                 other.add_hp(-10)
+                if self.dir == 1:
+                    other.attacked_move_value = 10
+                else:
+                    other.attacked_move_value = -10
         pass
 

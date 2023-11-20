@@ -17,12 +17,15 @@ FRAME_PER_TIME = 5
 class Monster:
     walk_images = ()
     attack_images = ()
+    attacked_image = None
 
     def load_images(self):
         if not Monster.walk_images:
             Monster.walk_images = ([load_image('Resources/Monster/Walk/' + str(i) + '.png') for i in range(4)], 4)
         if not Monster.attack_images:
             Monster.attack_images = ([load_image('Resources/Monster/Attack/' + str(i) + '.png') for i in range(3)], 3)
+        if not Monster.attacked_image:
+            Monster.attacked_image = load_image('Resources/Monster/Attack/Attacked.png')
 
     def __init__(self):
         self.x, self.y = random.randint(1280 - 640, 1280), 170
@@ -33,6 +36,7 @@ class Monster:
         self.hp = 100
         self.font = load_font('ENCR10B.TTF', 30)
         self.last_attack_time = get_time()
+        self.attacked_move_value = 0
 
 
     def update(self):
@@ -45,11 +49,25 @@ class Monster:
                 self.dir = -1
             elif self.x < 640:
                 self.dir = 1
+            if self.attacked_move_value != 0:
+                if self.attacked_move_value > 0:
+                    move_val = RUN_SPEED_PPS * game_framework.frame_time * 5
+                    self.attacked_move_value -= move_val
+                    self.x += move_val
+                else:
+                    move_val = RUN_SPEED_PPS * game_framework.frame_time * -5
+                    self.attacked_move_value -= move_val
+                    self.x -= move_val
+                if abs(self.attacked_move_value) < 1:
+                    self.attacked_move_value = 0
             self.x = clamp(640, self.x, 1280)
 
 
     def draw(self):
-        if self.is_attack:
+        if self.attacked_move_value != 0:
+            Monster.attacked_image.composite_draw(0, '', self.x, self.y, 163, 180)
+            pass
+        elif self.is_attack:
             if self.dir > 0:
                 Monster.attack_images[0][int(self.frame)].composite_draw(0, '', self.x, self.y, 268, 189)
             else:
