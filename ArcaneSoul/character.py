@@ -228,8 +228,8 @@ class Jump:
             boy.frame = 3
         elif Jump.velocity <= -1:
             boy.frame = 4
-        if boy.y <= 230:
-            boy.y = 230
+        if boy.y <= 220:
+            boy.y = 220
             boy.frame = 5
             Jump.velocity = Jump.VEL
         boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 1.5
