@@ -4,6 +4,8 @@ import game_framework
 
 from pico2d import *
 
+import play_mode
+
 # zombie Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
 RUN_SPEED_KMPH = 10.0  # Km / Hour
@@ -40,8 +42,12 @@ class Monster:
 
 
     def update(self):
+        if abs(self.x - play_mode.lisa.x) < 100:
+            self.is_attack = True
+        else:
+            self.is_attack = False
         if self.is_attack:
-            self.frame = (self.frame + FRAME_PER_TIME * game_framework.frame_time) % Monster.attack_images[1]
+            self.frame = (self.frame + FRAME_PER_TIME * game_framework.frame_time / 2) % Monster.attack_images[1]
         else:
             self.frame = (self.frame + FRAME_PER_TIME * game_framework.frame_time) % Monster.walk_images[1]
             self.x += RUN_SPEED_PPS * self.dir * game_framework.frame_time
@@ -49,18 +55,18 @@ class Monster:
                 self.dir = -1
             elif self.x < 640:
                 self.dir = 1
-            if self.attacked_move_value != 0:
-                if self.attacked_move_value > 0:
-                    move_val = RUN_SPEED_PPS * game_framework.frame_time * 5
-                    self.attacked_move_value -= move_val
-                    self.x += move_val
-                else:
-                    move_val = RUN_SPEED_PPS * game_framework.frame_time * -5
-                    self.attacked_move_value -= move_val
-                    self.x -= move_val
-                if abs(self.attacked_move_value) < 1:
-                    self.attacked_move_value = 0
-            self.x = clamp(640, self.x, 1280)
+        if self.attacked_move_value != 0:
+            if self.attacked_move_value > 0:
+                move_val = RUN_SPEED_PPS * game_framework.frame_time * 5
+                self.attacked_move_value -= move_val
+                self.x += move_val
+            else:
+                move_val = RUN_SPEED_PPS * game_framework.frame_time * -5
+                self.attacked_move_value -= move_val
+                self.x -= move_val
+            if abs(self.attacked_move_value) < 1:
+                self.attacked_move_value = 0
+        self.x = clamp(640, self.x, 1280)
 
 
     def draw(self):
