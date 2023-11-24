@@ -301,10 +301,11 @@ class Lisa:
         self.idle_images = ([load_image('Resources/Character/Idle/' + str(i) + '.png') for i in range(11)], 11)
         self.jump_images = ([load_image('Resources/Character/Jump/' + str(i) + '.png') for i in range(7)], 7)
         self.skill_images = ([load_image('Resources/Character/Skill/' + str(i) + '.png') for i in range(4)], 4)
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('ENCR10B.TTF', 40)
         self.state_machine = StateMachine(self)
         self.state_machine.start()
         self.last_attack_time = get_time()
+        self.hp = 300
 
 
     # def fire_ball(self):
@@ -321,7 +322,7 @@ class Lisa:
 
     def draw(self):
         self.state_machine.draw()
-        # self.font.draw(self.x-10, self.y + 50, f'{self.ball_count:02d}', (255, 255, 0))
+        self.font.draw(self.x-50, self.y + 150, str(self.hp), (0, 255, 255))
         # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
 
     # fill here
