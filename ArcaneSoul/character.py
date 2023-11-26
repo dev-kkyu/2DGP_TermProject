@@ -306,6 +306,7 @@ class Lisa:
         self.state_machine.start()
         self.last_attack_time = get_time()
         self.hp = 300
+        self.attacked_time = get_time()
 
 
     # def fire_ball(self):
@@ -342,5 +343,10 @@ class Lisa:
                     other.attacked_move_value = 10
                 else:
                     other.attacked_move_value = -10
+            if other.is_attack:
+                now_time = get_time()
+                if now_time - self.attacked_time > 1:
+                    self.hp -= 10
+                    self.attacked_time = now_time
         pass
 
