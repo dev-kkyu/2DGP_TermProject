@@ -36,7 +36,7 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    monsters = [Monster() for _ in range(5)]
+    monsters = [Monster() for _ in range(15)]
     game_world.add_objects(monsters, 1)
 
     game_world.add_collision_pair('lisa:monster', lisa, None)

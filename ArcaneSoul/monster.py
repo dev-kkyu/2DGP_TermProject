@@ -30,7 +30,7 @@ class Monster:
             Monster.attacked_image = load_image('Resources/Monster/Attack/Attacked.png')
 
     def __init__(self):
-        self.x, self.y = random.randint(1280 - 640, 1280), 170
+        self.x, self.y = random.randint(640, play_mode.background.w - 50), 170
         self.load_images()
         self.frame = random.randint(0, 2)
         self.dir = random.choice([-1,1])
@@ -51,7 +51,7 @@ class Monster:
         else:
             self.frame = (self.frame + FRAME_PER_TIME * game_framework.frame_time) % Monster.walk_images[1]
             self.x += RUN_SPEED_PPS * self.dir * game_framework.frame_time
-            if self.x > 1280:
+            if self.x > play_mode.background.w - 50:
                 self.dir = -1
             elif self.x < 640:
                 self.dir = 1
@@ -66,25 +66,26 @@ class Monster:
                 self.x -= move_val
             if abs(self.attacked_move_value) < 1:
                 self.attacked_move_value = 0
-        self.x = clamp(640, self.x, 1280)
+        self.x = clamp(640, self.x, play_mode.background.w - 50)
 
 
     def draw(self):
+        sx = self.x - play_mode.background.window_left
         if self.attacked_move_value != 0:
-            Monster.attacked_image.composite_draw(0, '', self.x, self.y, 163, 180)
+            Monster.attacked_image.composite_draw(0, '', sx, self.y, 163, 180)
             pass
         elif self.is_attack:
             if self.dir > 0:
-                Monster.attack_images[0][int(self.frame)].composite_draw(0, '', self.x, self.y, 268, 189)
+                Monster.attack_images[0][int(self.frame)].composite_draw(0, '', sx, self.y, 268, 189)
             else:
-                Monster.attack_images[0][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 268, 189)
+                Monster.attack_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y, 268, 189)
         else:
             if self.dir > 0:
-                Monster.walk_images[0][int(self.frame)].composite_draw(0, '', self.x, self.y, 163, 180)
+                Monster.walk_images[0][int(self.frame)].composite_draw(0, '', sx, self.y, 163, 180)
             else:
-                Monster.walk_images[0][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 163, 180)
+                Monster.walk_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y, 163, 180)
         # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
-        self.font.draw(self.x - 25, self.y + 80, str(self.hp), (255, 0, 0))
+        self.font.draw(sx - 25, self.y + 80, str(self.hp), (255, 0, 0))
 
 
     def add_hp(self, hp):

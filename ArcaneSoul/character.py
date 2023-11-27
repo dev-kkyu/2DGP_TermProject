@@ -145,7 +145,7 @@ class Walk:
         else:
             # boy.frame = (boy.frame + 1) % 8
             boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
-            boy.x = clamp(25, boy.x, 1280-25)
+            boy.x = clamp(25, boy.x, play_mode.background.w - 25)
             boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.walk_images[1]
 
 
@@ -239,7 +239,7 @@ class Jump:
             boy.frame = 5
             Jump.velocity = Jump.VEL
         boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 1.5
-        boy.x = clamp(25, boy.x, 1280 - 25)
+        boy.x = clamp(25, boy.x, play_mode.background.w - 25)
         pass
 
     @staticmethod

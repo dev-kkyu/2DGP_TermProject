@@ -19,7 +19,7 @@ class Background:
         pass
 
     def draw(self):
-        for x in range(0, 1280 + 249, 498):
+        for x in range(0, 1280 + 498, 498):
                 self.image.draw(x - (int(self.window_left) % 498), 360, 498, 720)
 
 
