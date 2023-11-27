@@ -21,22 +21,23 @@ def handle_events():
             lisa.handle_event(event)
 
 def init():
+    global background
     global grass
     global lisa
 
     running = True
 
     background = Background()
+    lisa = Lisa()
+
     game_world.add_object(background, 0)
+    game_world.add_object(lisa, 1)
 
     grass = Grass()
     game_world.add_object(grass, 0)
 
     monsters = [Monster() for _ in range(5)]
     game_world.add_objects(monsters, 1)
-
-    lisa = Lisa()
-    game_world.add_object(lisa, 1)
 
     game_world.add_collision_pair('lisa:monster', lisa, None)
     for mon in monsters:

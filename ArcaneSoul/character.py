@@ -4,8 +4,11 @@ from pico2d import get_time, load_image, load_font, clamp, SDL_KEYDOWN, SDL_KEYU
     draw_rectangle
 from sdl2 import SDLK_LCTRL
 
+import background
 import game_world
 import game_framework
+import play_mode
+
 
 # state event check
 # ( state event type, event value )
@@ -98,15 +101,16 @@ class Idle:
 
     @staticmethod
     def draw(boy):
+        sx = boy.x - play_mode.background.window_left
         if Attack.is_enter:
             Attack.draw(boy)
         elif Jump.is_enter:
             Jump.draw(boy)
         else:
             if boy.face_dir == 1:
-                boy.idle_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+                boy.idle_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 150, 270)
             else:
-                boy.idle_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
+                boy.idle_images[0][int(boy.frame)].composite_draw(0, 'h', sx, boy.y, 150, 270)
 
 
 
@@ -147,15 +151,16 @@ class Walk:
 
     @staticmethod
     def draw(boy):
+        sx = boy.x - play_mode.background.window_left
         if Attack.is_enter:
             Attack.draw(boy)
         elif Jump.is_enter:
             Jump.draw(boy)
         else:
             if boy.face_dir == 1:
-                boy.walk_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 150, 270)
+                boy.walk_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 150, 270)
             else:
-                boy.walk_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 150, 270)
+                boy.walk_images[0][int(boy.frame)].composite_draw(0, 'h', sx, boy.y, 150, 270)
             # boy.image.clip_draw(int(boy.frame) * 100, boy.action * 100, 100, 100, boy.x, boy.y)
 
 class Attack:
@@ -187,10 +192,11 @@ class Attack:
 
     @staticmethod
     def draw(boy):
+        sx = boy.x - play_mode.background.window_left
         if (boy.face_dir == 1):
-            boy.attack_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 324, 270)
+            boy.attack_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 324, 270)
         else:
-            boy.attack_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 324, 270)
+            boy.attack_images[0][int(boy.frame)].composite_draw(0, 'h', sx, boy.y, 324, 270)
 
 
 class Jump:
@@ -249,10 +255,11 @@ class Jump:
 
     @staticmethod
     def draw(boy):
+        sx = boy.x - play_mode.background.window_left
         if (boy.face_dir == 1):
-            boy.jump_images[0][int(boy.frame)].composite_draw(0, '', boy.x, boy.y, 217, 300)
+            boy.jump_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 217, 300)
         else:
-            boy.jump_images[0][int(boy.frame)].composite_draw(0, 'h', boy.x, boy.y, 217, 300)
+            boy.jump_images[0][int(boy.frame)].composite_draw(0, 'h', sx, boy.y, 217, 300)
 
 
 class StateMachine:
@@ -322,8 +329,9 @@ class Lisa:
         self.state_machine.handle_event(('INPUT', event))
 
     def draw(self):
+        sx = self.x - play_mode.background.window_left
         self.state_machine.draw()
-        self.font.draw(self.x-50, self.y + 150, str(self.hp), (0, 255, 255))
+        self.font.draw(sx-50, self.y + 150, str(self.hp), (0, 255, 255))
         # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
 
     # fill here
