@@ -4,6 +4,7 @@ import game_framework
 
 from pico2d import *
 
+import game_world
 import play_mode
 
 # zombie Run Speed
@@ -67,6 +68,9 @@ class Monster:
             if abs(self.attacked_move_value) < 1:
                 self.attacked_move_value = 0
         self.x = clamp(640, self.x, play_mode.background.w - 50)
+        if self.hp <= 0:
+            game_world.remove_object(self)
+            game_world.remove_collision_object(self)
 
 
     def draw(self):
