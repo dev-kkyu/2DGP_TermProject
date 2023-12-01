@@ -7,7 +7,7 @@ from sdl2 import SDLK_LCTRL
 import background
 import game_world
 import game_framework
-import play_mode
+import server
 
 
 # state event check
@@ -101,7 +101,7 @@ class Idle:
 
     @staticmethod
     def draw(boy):
-        sx = boy.x - play_mode.background.window_left
+        sx = boy.x - server.background.window_left
         if Attack.is_enter:
             Attack.draw(boy)
         elif Jump.is_enter:
@@ -145,13 +145,13 @@ class Walk:
         else:
             # boy.frame = (boy.frame + 1) % 8
             boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time
-            boy.x = clamp(25, boy.x, play_mode.background.w - 25)
+            boy.x = clamp(25, boy.x, server.background.w - 25)
             boy.frame = (boy.frame + FRAME_PER_TIME * game_framework.frame_time) % boy.walk_images[1]
 
 
     @staticmethod
     def draw(boy):
-        sx = boy.x - play_mode.background.window_left
+        sx = boy.x - server.background.window_left
         if Attack.is_enter:
             Attack.draw(boy)
         elif Jump.is_enter:
@@ -192,7 +192,7 @@ class Attack:
 
     @staticmethod
     def draw(boy):
-        sx = boy.x - play_mode.background.window_left
+        sx = boy.x - server.background.window_left
         if (boy.face_dir == 1):
             boy.attack_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 324, 270)
         else:
@@ -239,7 +239,7 @@ class Jump:
             boy.frame = 5
             Jump.velocity = Jump.VEL
         boy.x += boy.dir * RUN_SPEED_PPS * game_framework.frame_time * 1.5
-        boy.x = clamp(25, boy.x, play_mode.background.w - 25)
+        boy.x = clamp(25, boy.x, server.background.w - 25)
         pass
 
     @staticmethod
@@ -255,7 +255,7 @@ class Jump:
 
     @staticmethod
     def draw(boy):
-        sx = boy.x - play_mode.background.window_left
+        sx = boy.x - server.background.window_left
         if (boy.face_dir == 1):
             boy.jump_images[0][int(boy.frame)].composite_draw(0, '', sx, boy.y, 217, 300)
         else:
@@ -329,7 +329,7 @@ class Lisa:
         self.state_machine.handle_event(('INPUT', event))
 
     def draw(self):
-        sx = self.x - play_mode.background.window_left
+        sx = self.x - server.background.window_left
         self.state_machine.draw()
         self.font.draw(sx-50, self.y + 150, str(self.hp), (0, 255, 255))
         # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.

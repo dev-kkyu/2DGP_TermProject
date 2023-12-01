@@ -4,23 +4,11 @@ from pico2d import *
 import game_framework
 
 import game_world
-import play_mode
-import boss_mode
+from background2 import Grass2, Background2
+from boss import Boss
+from character import Lisa
 
-
-class Title:
-    def __init__(self):
-        self.bg_image = load_image('Resources/Lobby/bg1.png')
-        self.bg2_image = load_image('Resources/Lobby/bg0.png')
-        self.title_image = load_image('Resources/Lobby/title.png')
-
-    def update(self):
-        pass
-
-    def draw(self):
-        self.bg_image.draw(640, 360, 1280, 720)
-        self.bg2_image.draw(640, 360, 1280, 720)
-        self.title_image.draw(640, 400, 1000, 320)
+# boy = None
 
 def handle_events():
     events = get_events()
@@ -29,19 +17,30 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
-            game_framework.change_mode(boss_mode)
         else:
-            pass
+            lisa.handle_event(event)
 
 def init():
+    global background
     global grass
     global lisa
 
     running = True
 
-    title = Title()
-    game_world.add_object(title, 0)
+    background = Background2()
+    lisa = Lisa()
+
+    game_world.add_object(background, 0)
+    game_world.add_object(lisa, 1)
+
+    grass = Grass2()
+    game_world.add_object(grass, 0)
+
+    monster = Boss()
+    game_world.add_object(monster, 1)
+
+    game_world.add_collision_pair('lisa:monster', lisa, None)
+    game_world.add_collision_pair('lisa:monster', None, monster)
 
 def finish():
     game_world.clear()
@@ -52,7 +51,6 @@ def update():
     game_world.update()
     game_world.handle_collisions()
     # fill here
-
 
 def draw():
     clear_canvas()
