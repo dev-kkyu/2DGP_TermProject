@@ -8,7 +8,7 @@ import server
 class Background2:
     width = 2500
     def __init__(self):
-        self.image = load_image('Resources/Background/b1.png')
+        self.image = load_image('Resources/Background/b2.png')
         self.cw = get_canvas_width()
 
         self.w = Background2.width
@@ -23,8 +23,8 @@ class Background2:
         pass
 
     def draw(self):
-        for x in range(0, 1280 + 498, 498):
-                self.image.draw(x - (int(self.window_left) % 498), 360, 498, 720)
+        for x in range(0, 1280 + 300, 300):
+                self.image.draw(x - (int(self.window_left) % 300), 360, 300, 720)
 
 
 class Grass2:
