@@ -29,19 +29,19 @@ class Boss:
             Boss.attack_images = ([load_image('Resources/Boss/Attack/' + str(i + 1) + '.png') for i in range(6)], 6)
 
     def __init__(self):
-        self.x, self.y = random.randint(640, boss_mode.background.w - 50), 170
+        self.x, self.y = random.randint(640, boss_mode.background.w - 50), 330
         self.load_images()
         self.frame = random.randint(0, 2)
         self.dir = random.choice([-1,1])
         self.is_attack = False
-        self.hp = 100
-        self.font = load_font('ENCR10B.TTF', 30)
+        self.hp = 300
+        self.font = load_font('ENCR10B.TTF', 64)
         self.last_attack_time = get_time()
         self.attacked_move_value = 0
 
 
     def update(self):
-        if abs(self.x - boss_mode.lisa.x) < 100:
+        if abs(self.x - boss_mode.lisa.x) < 200:
             self.is_attack = True
         else:
             self.is_attack = False
@@ -75,16 +75,16 @@ class Boss:
         sx = self.x - boss_mode.background.window_left
         if self.is_attack:
             if self.dir > 0:
-                Boss.attack_images[0][int(self.frame)].composite_draw(0, '', sx, self.y, 268, 189)
+                Boss.attack_images[0][int(self.frame)].composite_draw(0, '', sx, self.y + 45, 476, 592)
             else:
-                Boss.attack_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y, 268, 189)
+                Boss.attack_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y + 45, 476, 592)
         else:
             if self.dir > 0:
-                Boss.walk_images[0][int(self.frame)].composite_draw(0, '', sx, self.y, 163, 180)
+                Boss.walk_images[0][int(self.frame)].composite_draw(0, '', sx, self.y, 314, 516)
             else:
-                Boss.walk_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y, 163, 180)
+                Boss.walk_images[0][int(self.frame)].composite_draw(0, 'h', sx, self.y, 314, 516)
         # draw_rectangle(*self.get_bb())  # 튜플을 풀어헤쳐서 각각 인자로 전달.
-        self.font.draw(sx - 25, self.y + 80, str(self.hp), (255, 0, 0))
+        self.font.draw(sx - 25, self.y + 300, str(self.hp), (255, 0, 0))
 
 
     def add_hp(self, hp):
@@ -99,7 +99,7 @@ class Boss:
 
 
     def get_bb(self):
-        return self.x - 80, self.y - 90, self.x + 80, self.y + 90 # 값 4개짜리 튜플 1개
+        return self.x - 150, self.y - 250, self.x + 150, self.y + 250 # 값 4개짜리 튜플 1개
 
     def handle_collision(self, group, other):
         pass
