@@ -4,6 +4,7 @@ from pico2d import *
 import game_framework
 
 import game_world
+import title_mode
 from background2 import Grass2, Background2
 from boss import Boss
 from character import Lisa
@@ -50,6 +51,9 @@ def finish():
 def update():
     game_world.update()
     game_world.handle_collisions()
+
+    if len(game_world.objects[1]) <= 1:
+        game_framework.change_mode(title_mode)
     # fill here
 
 def draw():
