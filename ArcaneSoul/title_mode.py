@@ -5,7 +5,6 @@ import game_framework
 
 import game_world
 import play_mode
-import boss_mode
 
 
 class Title:
@@ -30,7 +29,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
-            game_framework.change_mode(boss_mode)
+            game_framework.change_mode(play_mode)
         else:
             pass
 

@@ -1,6 +1,8 @@
 import random
 
 from pico2d import *
+
+import boss_mode
 import game_framework
 
 import game_world
@@ -36,27 +38,12 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    monsters = [Monster() for _ in range(15)]
+    monsters = [Monster() for _ in range(5)]
     game_world.add_objects(monsters, 1)
 
     game_world.add_collision_pair('lisa:monster', lisa, None)
     for mon in monsters:
         game_world.add_collision_pair('lisa:monster', None, mon)
-
-    # fill here
-    # # 축구공 바닥에 뿌리기
-    # global balls
-    # balls = [Ball(random.randint(0, 1600), 60, 0.0) for _ in range(30)]
-    # game_world.add_objects(balls, 1)
-    #
-    # # 충돌 상황을 등록... boy와 balls들의 충돌 상황을 등록.
-    # game_world.add_collision_pair('boy:ball', boy, None)
-    # for ball in balls:
-    #     game_world.add_collision_pair('boy:ball', None, ball)
-    #
-    # # 좀비 5마리 추가
-    # zombies = [Zombie() for _ in range(5)]
-    # game_world.add_objects(zombies, 1)
 
 
 def finish():
@@ -68,7 +55,8 @@ def update():
     game_world.update()
     game_world.handle_collisions()
     # fill here
-
+    if len(game_world.objects[1]) <= 1:
+        game_framework.change_mode(boss_mode)
     # for ball in balls.copy():
     #     if game_world.collide(boy, ball):
     #         print('COLLISION by:ball')
