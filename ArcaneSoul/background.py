@@ -17,6 +17,10 @@ class Background:
 
         server.background = self
 
+        self.bgm = load_music('Resources/Bgm/arcanebgm.mp3')
+        self.bgm.set_volume(32)
+        self.bgm.repeat_play()
+
     def update(self):
         self.window_left = int(play_mode.lisa.x) - self.cw // 2
         self.window_left = clamp(0, self.window_left, self.w - self.cw - 1)
